@@ -343,15 +343,15 @@ void	orderlow(t_stack **stack)
 	return;
 }
    
-int mid_insertionSort(int *array, int n) 
+int *chunksize(int *array, int len) 
 { 
 	int i;
 	int j;
 	int element;
-	int	midpoint;
- 
+	int	*chunk;
+
 	i = 1;
-	while (i < n)
+	while (i < len)
 	{ 
 		element = array[i]; 
 		j = i - 1;
@@ -363,9 +363,67 @@ int mid_insertionSort(int *array, int n)
         array[j + 1] = element;
 		i++;
     }
-	midpoint = array[(n/2)];
-	printf("El midpoint del array es %d\n", midpoint);
-	return(midpoint);
+	i = 0;
+	if (len < 100)
+	{
+		chunk = (int *)malloc(sizeof(int) * 5);
+		while (i < 5)
+		{
+			chunk[i] = array[((i + 1) * len / 5)];
+			i++;
+		}
+	}
+	else 
+	{
+		chunk = (int *)malloc(sizeof(int) * 11);
+		while (i < 11)
+		{
+			chunk[i] = array[((i + 1) * len / 11)];
+			i++;
+		}
+	}
+	i = 0; 
+	while (i < 4)
+	{
+		printf("El termino %d del array es %d\n", i, chunk[i]);
+		i++;
+	}
+	return(chunk);
+}
+
+int scanstack(t_stack **stack_a, t_stack **stack_b, int *chunk, int *array, int len)
+{
+	int i;
+	int holdfirst;
+	int holdsecond;
+	t_stack *temp;
+
+	i = 0;
+	holdfirst = 0;
+	holdsecond = 0;
+	while (array[holdfirst] != chunk[i])
+		holdfirst++;
+	holdsecond = len;
+	while (array[holdsecond] != chunk[i])
+		holdsecond--;
+	if (holdfirst < (len / 2) && holdsecond > (len / 2) && holdfirst <= holdsecond)
+	{
+		while (i <= holdfirst)
+		{
+			write(2, "ra\n", 3);
+			ra_rb(stack_a);
+			i++;
+		}
+	}
+	else
+	{
+		while (i <= holdfirst)
+		{
+			write(2, "rra\n", 4);
+			rra_rrb(stack_a);
+			i++;
+		}
+	}
 }
 
 int	movechunk(t_stack **stack_a, t_stack **stack_b, int midpoint)
@@ -406,53 +464,46 @@ int	movechunk(t_stack **stack_a, t_stack **stack_b, int midpoint)
 	return (0);
 }
 
-void	orderfive(t_stack **stack)
+void	orderfive(t_stack **stack, t_stack **stackb)
 {
-	t_stack **stackb = NULL;
-
-	*stackb = create_node();
+	int i;
+	
+	i = 0;
 	pa_pb(stack, stackb);
-	printf("pa\n");
 	pa_pb(stack, stackb);
-	printf("pa\n");
+	write(2, "pb\n", 3);
+	write(2, "pb\n", 3);
 	orderthree(stack);
-	pa_pb(stackb, stack);
-	printf("pb\n");
-	if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
-		(*stack)->next->next->num && (*stack)->num > (*stack)->next->next->next->num)
-		{
-			ra_rb(stack);
-			printf("ra\n");
-		}
-	else if ((*stack)->num > (*stack)->next->num && (*stack)->num < 
-		(*stack)->next->next->num)
-		{
-			sa_sb(stack);
-			printf("sa\n");
-		}
-	else if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
-		(*stack)->next->next->num && (*stack)->num < (*stack)->next->next->next->num)
-		{
-			rra_rrb(stack);
-			sa_sb(stack);
-			ra_rb(stack);
-			ra_rb(stack);
-		}
-	pa_pb(stackb, stack);
-	if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
-		(*stack)->next->next->num && (*stack)->num > (*stack)->next->next->next->num)
-			ra_rb(stack);
-	else if ((*stack)->num > (*stack)->next->num && (*stack)->num < 
-		(*stack)->next->next->num)
-			sa_sb(stack);
-	else if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
-		(*stack)->next->next->num && (*stack)->num < (*stack)->next->next->next->num)
-		{
-			rra_rrb(stack);
-			sa_sb(stack);
-			ra_rb(stack);
-			ra_rb(stack);
-		}
+	while (i < 2)
+	{
+		pa_pb(stackb, stack);
+		write(2, "pa\n", 3);
+		if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+			(*stack)->next->next->num && (*stack)->num > (*stack)->next->next->next->num)
+			{
+				write(2, "ra\n", 3);
+				ra_rb(stack);
+			}
+		else if ((*stack)->num > (*stack)->next->num && (*stack)->num < 
+			(*stack)->next->next->num)
+			{
+				write(2, "sa\n", 3);
+				sa_sb(stack);
+			}
+		else if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+			(*stack)->next->next->num && (*stack)->num < (*stack)->next->next->next->num)
+			{
+				rra_rrb(stack);
+				write(2, "rra\n", 4);
+				sa_sb(stack);
+				write(2, "sa\n", 3);
+				ra_rb(stack);
+				write(2, "ra\n", 3);
+				ra_rb(stack);
+				write(2, "ra\n", 3);
+			}
+		i++;
+	}
 	printf("\n La solucion final\n");
 	printarray(stack);
 	return;
@@ -463,7 +514,7 @@ int	main(int argc, char **argv)
 	t_stack	*stack_a;
 	t_stack	*stack_b;
 	int	len;
-	int midpoint;
+	int *chunk;
 	int *array;
 
 	if (!(stack_a = copy_args_in_stack(argc, argv)))
@@ -473,22 +524,17 @@ int	main(int argc, char **argv)
 	}
 	len = s_len(stack_a);
 	printf("El numero de terminos es %d\n", len);
-//	stack_b = NULL;
-//	printf("\nEl stack original es: \n");
-//	printf("stack_a\n");
-//	printarray(&stack_a);
-//	printf("stack_b\n");
-//	printarray(&stack_b);
+	stack_b = NULL;
 	if (len < 4)
 		orderlow(&stack_a);
 	else if (len == 5)
-		orderfive(&stack_a);
-	else
+		orderfive(&stack_a, &stack_b);
+	else if (len > 5)
 	{
 		array = create_array_from_stack(stack_a, len);
-		midpoint = mid_insertionSort(array, len);
-//		test(&stack_a, &stack_b);
-		movechunk(&stack_a, &stack_b, midpoint);
+		chunk = chunksize(array, len);
+		scanstack(stack_a, stack_b, chunk, array, len);
+//		movechunk(&stack_a, &stack_b, midpoint);
 	}
 	return (0);
 }
