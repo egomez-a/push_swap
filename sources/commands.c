@@ -6,9 +6,18 @@
 /*   By: egomez-a <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/30 18:34:21 by egomez-a          #+#    #+#             */
-/*   Updated: 2021/06/30 18:34:34 by egomez-a         ###   ########.fr       */
+/*   Updated: 2021/07/01 13:14:30 by egomez-a         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+void	swap(int *a, int *b)
+{
+	int	tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
 
 int		sa_sb(t_stack **stack_ab)
 {

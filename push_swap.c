@@ -276,7 +276,6 @@ t_stack	*copy_args_in_stack(int argc, char **argv)
 
 void	orderthree(t_stack **stack)
 {
-	int i;
 	int len; 
 
 	len = s_len(*stack);
@@ -327,9 +326,7 @@ void	orderthree(t_stack **stack)
 
 void	orderlow(t_stack **stack)
 {
-	int i;
 	int len; 
-	int *array;
 
 	len = s_len(*stack);
 	if (len == 1)
@@ -341,6 +338,7 @@ void	orderlow(t_stack **stack)
 	}
 	else if (len == 3)
 		orderthree(stack);
+	printf("\n La solucion final\n");
 	printarray(stack);
 	return;
 }
@@ -372,44 +370,92 @@ int mid_insertionSort(int *array, int n)
 
 int	movechunk(t_stack **stack_a, t_stack **stack_b, int midpoint)
 {
-	t_stack *stacktemp;
-
-	int i;
-	int len;
-	int *array;
+//	t_stack *stacktemp;
+	int 	counter;
 	
-	len = s_len(*stack_a);
-	array = create_array_from_stack(*stack_a, len);
-	midpoint = mid_insertionSort(array, len);
+	counter = 0;
 	if ((*stack_a)->num < midpoint)
 	{
 		while ((*stack_a)->num < midpoint)
 		{
 			pa_pb(stack_a, stack_b);
+			counter++;
 			printf("pa\n");
-			(*stack_a) = (*stack_a)->next;
-			(*stack_b) = (*stack_b)->next;
+			printf("counter %d\n", counter);
 		}
 	}
-	if ((*stack_a)->num >= midpoint)
-	{
-		stacktemp = (*stack_a);
-		while(stacktemp->next)
-			stacktemp = stacktemp->next;
-		if (stacktemp->num < midpoint)
-			while (stacktemp->num < midpoint)
-			{
-				rra_rrb(stack_a);
-				printf("rra\n");
-				pa_pb(stack_a, stack_b);
-				printf("pa\n");
-			}
-	}
+//	if ((*stack_a)->num >= midpoint)
+//	{
+//		stacktemp = (*stack_a);
+//		while(stacktemp->next)
+//			stacktemp = stacktemp->next;
+//		if (stacktemp->num < midpoint)
+//			while (stacktemp->num < midpoint)
+//			{
+//				rra_rrb(stack_a);
+//				printf("rra\n");
+//				pa_pb(stack_a, stack_b);
+//				printf("pa\n");
+//			}
+//	}
+	printf("solucion final\n");
 	printf("stack_a\n");
 	printarray(stack_a);
 	printf("stack_b\n");
 	printarray(stack_b);
 	return (0);
+}
+
+void	orderfive(t_stack **stack)
+{
+	t_stack **stackb = NULL;
+
+	*stackb = create_node();
+	pa_pb(stack, stackb);
+	printf("pa\n");
+	pa_pb(stack, stackb);
+	printf("pa\n");
+	orderthree(stack);
+	pa_pb(stackb, stack);
+	printf("pb\n");
+	if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+		(*stack)->next->next->num && (*stack)->num > (*stack)->next->next->next->num)
+		{
+			ra_rb(stack);
+			printf("ra\n");
+		}
+	else if ((*stack)->num > (*stack)->next->num && (*stack)->num < 
+		(*stack)->next->next->num)
+		{
+			sa_sb(stack);
+			printf("sa\n");
+		}
+	else if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+		(*stack)->next->next->num && (*stack)->num < (*stack)->next->next->next->num)
+		{
+			rra_rrb(stack);
+			sa_sb(stack);
+			ra_rb(stack);
+			ra_rb(stack);
+		}
+	pa_pb(stackb, stack);
+	if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+		(*stack)->next->next->num && (*stack)->num > (*stack)->next->next->next->num)
+			ra_rb(stack);
+	else if ((*stack)->num > (*stack)->next->num && (*stack)->num < 
+		(*stack)->next->next->num)
+			sa_sb(stack);
+	else if ((*stack)->num > (*stack)->next->num && (*stack)->num > 
+		(*stack)->next->next->num && (*stack)->num < (*stack)->next->next->next->num)
+		{
+			rra_rrb(stack);
+			sa_sb(stack);
+			ra_rb(stack);
+			ra_rb(stack);
+		}
+	printf("\n La solucion final\n");
+	printarray(stack);
+	return;
 }
 
 int	main(int argc, char **argv)
@@ -418,6 +464,7 @@ int	main(int argc, char **argv)
 	t_stack	*stack_b;
 	int	len;
 	int midpoint;
+	int *array;
 
 	if (!(stack_a = copy_args_in_stack(argc, argv)))
 	{
@@ -426,15 +473,22 @@ int	main(int argc, char **argv)
 	}
 	len = s_len(stack_a);
 	printf("El numero de terminos es %d\n", len);
-	stack_b = NULL;
-	printf("\nEl stack original es: \n");
-	printf("stack_a\n");
-	printarray(&stack_a);
-	printf("stack_b\n");
-	printarray(&stack_b);
-	if (len <= 4)
+//	stack_b = NULL;
+//	printf("\nEl stack original es: \n");
+//	printf("stack_a\n");
+//	printarray(&stack_a);
+//	printf("stack_b\n");
+//	printarray(&stack_b);
+	if (len < 4)
 		orderlow(&stack_a);
-	else if (len > 4)
+	else if (len == 5)
+		orderfive(&stack_a);
+	else
+	{
+		array = create_array_from_stack(stack_a, len);
+		midpoint = mid_insertionSort(array, len);
+//		test(&stack_a, &stack_b);
 		movechunk(&stack_a, &stack_b, midpoint);
+	}
 	return (0);
 }
